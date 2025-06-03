@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contour Webcam Cybercore Y2K</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        .webcam-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .webcam-frame {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            aspect-ratio: 16/9;
+        }
+
+        /* Centre rectangulaire */
+        .webcam-center {
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background-color: transparent;
+            z-index: 10;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .liquid-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .liquid-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            mix-blend-mode: screen;
+        }
+
+        /* Gradients fluides améliorés */
+        .liquid-path {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: linear-gradient(45deg, 
+                #ff00ff, 
+                #00ffff, 
+                #ff6ec7, 
+                #00f2ff,
+                #c400ff,
+                #00ffb3,
+                #ff00ff);
+            background-size: 400% 400%;
+            filter: url(#displacementFilter);
+        }
+
+        .liquid-path-1 {
+            animation: liquidMove 15s linear infinite, colorShift 10s linear infinite;
+        }
+
+        .liquid-path-2 {
+            animation: liquidMove 12s linear infinite reverse, colorShift 8s linear infinite reverse;
+            opacity: 0.6;
+        }
+
+        .liquid-path-3 {
+            animation: liquidMove 18s linear infinite, colorShift 12s linear infinite;
+            opacity: 0.5;
+        }
+
+        .holographic-glint {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0) 45%, 
+                rgba(255, 255, 255, 0.8) 50%, 
+                rgba(255, 255, 255, 0) 55%, 
+                transparent 100%);
+            background-size: 300% 300%;
+            mix-blend-mode: overlay;
+            animation: glintMove 8s linear infinite;
+        }
+
+        /* Éléments cybercore */
+        .cyber-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, 0.3) 25%, rgba(0, 255, 255, 0.3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, 0.3) 75%, rgba(0, 255, 255, 0.3) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, 0.3) 25%, rgba(0, 255, 255, 0.3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, 0.3) 75%, rgba(0, 255, 255, 0.3) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            mix-blend-mode: overlay;
+            opacity: 0.5;
+        }
+
+        .y2k-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(
+                circle at 50% 50%,
+                rgba(255, 255, 255, 0.3) 0%,
+                rgba(255, 255, 255, 0) 1%
+            );
+            background-size: 15px 15px;
+            mix-blend-mode: overlay;
+        }
+
+        .mask-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-mask-image: radial-gradient(
+                ellipse at center,
+                transparent 35%,
+                black 50%
+            );
+            mask-image: radial-gradient(
+                ellipse at center,
+                transparent 35%,
+                black 50%
+            );
+        }
+
+        /* Coins du rectangle */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            z-index: 20;
+        }
+
+        .corner-tl {
+            top: 15%;
+            left: 15%;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-tr {
+            top: 15%;
+            right: 15%;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bl {
+            bottom: 15%;
+            left: 15%;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-br {
+            bottom: 15%;
+            right: 15%;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Éléments décoratifs Y2K */
+        .y2k-element {
+            position: absolute;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+            mix-blend-mode: screen;
+        }
+
+        .y2k-element-1 {
+            width: 30px;
+            height: 30px;
+            top: 10%;
+            left: 10%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .y2k-element-2 {
+            width: 20px;
+            height: 20px;
+            bottom: 10%;
+            right: 10%;
+            animation: float 6s infinite ease-in-out reverse;
+        }
+
+        .y2k-element-3 {
+            width: 15px;
+            height: 15px;
+            bottom: 10%;
+            left: 10%;
+            animation: float 7s infinite ease-in-out 1s;
+        }
+
+        .y2k-element-4 {
+            width: 25px;
+            height: 25px;
+            top: 10%;
+            right: 10%;
+            animation: float 9s infinite ease-in-out 0.5s;
+        }
+
+        @keyframes liquidMove {
+            0% {
+                transform: rotate(0deg) scale(1.2);
+            }
+            100% {
+                transform: rotate(360deg) scale(1.2);
+            }
+        }
+
+        @keyframes colorShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes glintMove {
+            0% {
+                background-position: -100% -100%;
+            }
+            100% {
+                background-position: 200% 200%;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-10px) translateX(5px);
+            }
+            50% {
+                transform: translateY(0) translateX(10px);
+            }
+            75% {
+                transform: translateY(10px) translateX(5px);
+            }
+        }
+
+        .glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                0 0 40px rgba(255, 0, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.5),
+                inset 0 0 40px rgba(255, 0, 255, 0.3);
+            pointer-events: none;
+        }
+
+        /* Scanlines pour effet CRT */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 15;
+            opacity: 0.3;
+        }
+
+        /* Texte Y2K */
+        .y2k-text {
+            position: absolute;
+            font-family: 'Arial', sans-serif;
+            font-weight: bold;
+            font-style: italic;
+            color: #00ffff;
+            text-shadow: 2px 2px 0 #ff00ff, -2px -2px 0 #00ffff;
+            font-size: 12px;
+            transform: rotate(-90deg);
+            opacity: 0.8;
+        }
+
+        .y2k-text-1 {
+            top: 50%;
+            left: 5%;
+        }
+
+        .y2k-text-2 {
+            top: 50%;
+            right: 5%;
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="webcam-container">
+        <div class="webcam-frame">
+            <div class="mask-container">
+                <div class="liquid-border">
+                    <div class="liquid-layer">
+                        <div class="liquid-path liquid-path-1" style="transform: rotate(271.58deg) scale(1.24148);"></div>
+                    </div>
+                    <div class="liquid-layer">
+                        <div class="liquid-path liquid-path-2" style="transform: rotate(47.37deg) scale(1.2459);"></div>
+                    </div>
+                    <div class="liquid-layer">
+                        <div class="liquid-path liquid-path-3" style="transform: rotate(183.16deg) scale(1.20812);"></div>
+                    </div>
+                    <div class="holographic-glint"></div>
+                    <div class="cyber-grid"></div>
+                    <div class="y2k-dots"></div>
+                </div>
+            </div>
+            
+            <!-- Centre rectangulaire -->
+            <div class="webcam-center"></div>
+            
+            <!-- Coins décoratifs -->
+            <div class="corner corner-tl" style="opacity: 0.602483; transform: scale(1.09264);"></div>
+            <div class="corner corner-tr" style="opacity: 0.143569; transform: scale(1.01838);"></div>
+            <div class="corner corner-bl" style="opacity: 0.0123559; transform: scale(0.927215);"></div>
+            <div class="corner corner-br" style="opacity: 0.329481; transform: scale(0.902971);"></div>
+            
+            <!-- Éléments décoratifs Y2K -->
+            <div class="y2k-element y2k-element-1"></div>
+            <div class="y2k-element y2k-element-2"></div>
+            <div class="y2k-element y2k-element-3"></div>
+            <div class="y2k-element y2k-element-4"></div>
+            
+            <!-- Texte Y2K -->
+            <div class="y2k-text y2k-text-1">CYBER·Y2K</div>
+            <div class="y2k-text y2k-text-2">STREAM·CAM</div>
+            
+            <div class="glow"></div>
+            <div class="scanlines"></div>
+        </div>
+    </div>
+
+    <svg width="0" height="0">
+        <filter id="displacementFilter">
+            <feTurbulence type="turbulence" baseFrequency="0.01 0.01" numOctaves="3" seed="1" result="turbulence"></feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="30" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+        </filter>
+    </svg>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const liquidPaths = document.querySelectorAll('.liquid-path');
+            
+            // Animation organique pour les effets liquides
+            function animateLiquid() {
+                liquidPaths.forEach((path, index) => {
+                    const baseScale = 1.2;
+                    const scaleVariation = 0.05;
+                    const newScale = baseScale + Math.sin(Date.now() * 0.001 + index) * scaleVariation;
+                    
+                    path.style.transform = `rotate(${(Date.now() * (0.01 + index * 0.005)) % 360}deg) scale(${newScale})`;
+                });
+                
+                requestAnimationFrame(animateLiquid);
+            }
+            
+            // Animation pour les coins
+            function animateCorners() {
+                const corners = document.querySelectorAll('.corner');
+                corners.forEach((corner, index) => {
+                    const opacity = 0.5 + Math.sin(Date.now() * 0.003 + index) * 0.5;
+                    corner.style.opacity = opacity;
+                    
+                    // Effet de pulsation
+                    const scale = 1 + Math.sin(Date.now() * 0.002 + index) * 0.1;
+                    corner.style.transform = `scale(${scale})`;
+                });
+                
+                requestAnimationFrame(animateCorners);
+            }
+            
+            animateLiquid();
+            animateCorners();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'949fcf96f2b50210',t:'MTc0ODk2MDIxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><iframe height="1" width="1" style="position: absolute; top: 0px; left: 0px; border: medium; visibility: hidden;"></iframe>
+
+</body></html>
